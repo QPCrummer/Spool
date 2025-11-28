@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Set;
 
 public final class Constants {

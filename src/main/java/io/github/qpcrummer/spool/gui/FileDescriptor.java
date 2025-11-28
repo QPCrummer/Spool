@@ -40,14 +40,14 @@ public class FileDescriptor extends JPanel {
         tagMenu = new StayOpenPopupMenu(allTags, selectedTags);
 
         tagDropdownButton = new JButton("Tags ▼");
-        tagDropdownButton.addActionListener(e ->
+        tagDropdownButton.addActionListener(_ ->
                 tagMenu.show(tagDropdownButton, 0, tagDropdownButton.getHeight())
         );
 
         // Delete button
         JButton deleteBtn = new JButton("X");
         deleteBtn.setForeground(Color.RED);
-        deleteBtn.addActionListener(e -> deleteListener.onDelete(this));
+        deleteBtn.addActionListener(_ -> deleteListener.onDelete(this));
 
         // Layout
         JPanel leftPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));

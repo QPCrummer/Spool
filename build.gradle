@@ -1,9 +1,11 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'com.gradleup.shadow' version '9.2.2'
 }
 
 group = 'io.github.qpcrummer'
-version = '1.0-SNAPSHOT'
+version = '1.0.0'
 
 repositories {
     mavenCentral()
@@ -15,4 +17,12 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:2.0.17'
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'org.apache.pdfbox:pdfbox:3.0.6'
+}
+
+tasks.shadowJar {
+    archiveBaseName = "Spool"
+}
+
+application {
+    mainClass = 'io.github.qpcrummer.spool.Main'
 }

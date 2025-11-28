@@ -23,7 +23,6 @@ public class VirtualFileList {
     public static JList<FileRecord> fileJList;
     private final DefaultListModel<FileRecord> listModel;
     private final JTextField searchField;
-    private final JButton searchButton;
     private final JPanel mainPanel;
     private static final int BUTTON_HEIGHT = 30;
     private static final int BUTTON_WIDTH = 100;
@@ -34,7 +33,7 @@ public class VirtualFileList {
         // ---- Top search bar ----
         JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         searchField = new JTextField(30);
-        searchButton = new JButton("Search");
+        JButton searchButton = new JButton("Search");
         searchButton.addActionListener(_ -> fuzzySearch(searchField.getText()));
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
@@ -119,7 +118,7 @@ public class VirtualFileList {
     }
 
     // ---- Custom cell renderer ----
-    private class FileCellRenderer extends JPanel implements ListCellRenderer<FileRecord> {
+    private static class FileCellRenderer extends JPanel implements ListCellRenderer<FileRecord> {
 
         private final JLabel nameLabel = new JLabel();
         private final JLabel sellerLabel = new JLabel();

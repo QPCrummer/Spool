@@ -27,7 +27,6 @@ public class TagCheckboxList extends JPanel {
         java.util.List<String> fileTags = Database.getTagsForFile(fileId);
 
         for (String tag : allTags) {
-
             JCheckBox box = new JCheckBox(tag);
             box.setSelected(fileTags.contains(tag));
 

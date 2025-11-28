@@ -38,10 +38,8 @@ public class FileConverter {
 
             if (embroideryFileName.contains(".pdf")) {
                 generateThumbnailPDF(Constants.FILES.resolve(embroideryFileName), Constants.FILES.resolve(pngFileName));
-                SwingUtilities.invokeLater(() -> {
-                    // Update thumbnail
-                    VirtualFileList.updateThumbnail();
-                });
+                // Update thumbnail
+                SwingUtilities.invokeLater(VirtualFileList::updateThumbnail);
             } else {
                 // Python one-liner script
                 String script =
@@ -63,10 +61,8 @@ public class FileConverter {
                         throw new IOException("Thumbnail generation failed: exit code " + exit);
                     }
 
-                    SwingUtilities.invokeLater(() -> {
-                        // Update thumbnail
-                        VirtualFileList.updateThumbnail();
-                    });
+                    // Update thumbnail
+                    SwingUtilities.invokeLater(VirtualFileList::updateThumbnail);
                 } catch (Exception ex) {
                     LoggerUtils.LOGGER.warn("Failed to generate thumbnail", ex);
                 }

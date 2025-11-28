@@ -8,7 +8,6 @@ import io.github.qpcrummer.spool.gui.ConvertMenu;
 import io.github.qpcrummer.spool.gui.FileManagerPopup;
 import io.github.qpcrummer.spool.gui.TagCheckboxList;
 import io.github.qpcrummer.spool.gui.VirtualFileList;
-import io.github.qpcrummer.spool.utils.LoggerUtils;
 import io.github.qpcrummer.spool.utils.Theme;
 
 import javax.swing.*;

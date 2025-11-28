@@ -243,7 +243,7 @@ public class DBUtils {
 
         if (filterTags) {
             String placeholders = requiredTags.stream()
-                    .map(t -> "?")
+                    .map(_ -> "?")
                     .collect(Collectors.joining(","));
 
             sql.append(" AND t.name IN (").append(placeholders).append(") ");

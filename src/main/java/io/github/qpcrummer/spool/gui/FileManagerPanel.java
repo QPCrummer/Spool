@@ -16,8 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileManagerPanel extends JPanel {
-    private JPanel fileList;
-    private JButton uploadButton;
+    private final JPanel fileList;
 
     public FileManagerPanel(Runnable closePopupCallback) {
         setLayout(new BorderLayout());
@@ -34,8 +33,8 @@ public class FileManagerPanel extends JPanel {
         add(scroll, BorderLayout.CENTER);
 
         // ---- Upload button ----
-        uploadButton = new JButton("Upload");
-        uploadButton.addActionListener(e -> handleUpload(closePopupCallback));
+        JButton uploadButton = new JButton("Upload");
+        uploadButton.addActionListener(_ -> handleUpload(closePopupCallback));
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(uploadButton);
