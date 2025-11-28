@@ -1,6 +1,9 @@
 package io.github.qpcrummer.spool.utils;
 
 import io.github.qpcrummer.spool.Constants;
+import io.github.qpcrummer.spool.database.DBUtils;
+import io.github.qpcrummer.spool.database.Database;
+import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.gui.VirtualFileList;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
@@ -10,11 +13,10 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,7 +40,7 @@ public class FileConverter {
                 generateThumbnailPDF(Constants.FILES.resolve(embroideryFileName), Constants.FILES.resolve(pngFileName));
                 SwingUtilities.invokeLater(() -> {
                     // Update thumbnail
-                    VirtualFileList.updateThumbnail(embroideryFileName);
+                    VirtualFileList.updateThumbnail();
                 });
             } else {
                 // Python one-liner script
@@ -56,15 +58,6 @@ public class FileConverter {
                     pb.directory(Constants.FILES.toFile());
                     Process process = pb.start();
 
-                    // Read output
-                    try (BufferedReader br =
-                                 new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            System.out.println("[pystitch] " + line);
-                        }
-                    }
-
                     int exit = process.waitFor();
                     if (exit != 0) {
                         throw new IOException("Thumbnail generation failed: exit code " + exit);
@@ -72,7 +65,7 @@ public class FileConverter {
 
                     SwingUtilities.invokeLater(() -> {
                         // Update thumbnail
-                        VirtualFileList.updateThumbnail(embroideryFileName);
+                        VirtualFileList.updateThumbnail();
                     });
                 } catch (Exception ex) {
                     LoggerUtils.LOGGER.warn("Failed to generate thumbnail", ex);
@@ -87,7 +80,7 @@ public class FileConverter {
         );
 
         // If thumbnail exists and is newer than source → use cached
-        if (pngFile.exists() && pngFile.lastModified() > embroideryFile.lastModified()) {
+        if (pngFile.exists()) {
             return pngFile;
         }
 
@@ -109,6 +102,35 @@ public class FileConverter {
             LoggerUtils.LOGGER.info("Converted PDF to PNG");
         } catch (IOException e) {
             LoggerUtils.LOGGER.warn("Failed to convert PDF to PNG", e);
+        }
+    }
+
+    public static void convert(FileRecord file, String toFileType) {
+        String convertedFile = file.path().replaceAll("\\.[^.]+$", "") + "." + toFileType.toLowerCase(Locale.ROOT);
+
+        // Python one-liner script
+        String script =
+                "import pystitch\n" +
+                        "p=pystitch.read(r'" + file.path() + "')\n" +
+                        "pystitch.write(p, r'" + convertedFile + "')\n";
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder(
+                    "python", "-c", script
+            );
+
+            pb.redirectErrorStream(true);
+            pb.directory(Constants.FILES.toFile());
+            Process process = pb.start();
+
+            int exit = process.waitFor();
+            if (exit != 0) {
+                throw new IOException("Conversion failed: exit code " + exit);
+            }
+
+            DBUtils.addFile(convertedFile, toFileType.toUpperCase(Locale.ROOT), file.seller(), Database.getTagsForFile(file.id()));
+        } catch (Exception ex) {
+            LoggerUtils.LOGGER.warn("Failed to convert file", ex);
         }
     }
 }

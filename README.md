@@ -68,3 +68,4 @@ pip install --upgrade --force-reinstall git+https://github.com/QPCrummer/pystitc
 - Search through files to find matches
 - Export selected files directly to an attached USB drive
 - Upload files in bulk
+- Convert between many different file formats

@@ -3,6 +3,7 @@ package io.github.qpcrummer.spool.gui;
 import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.utils.FileUtils;
 import io.github.qpcrummer.spool.utils.LoggerUtils;
+import io.github.qpcrummer.spool.utils.Theme;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +20,7 @@ public class FileUpload extends JPanel {
         setBorder(BorderFactory.createDashedBorder(Color.GRAY));
         setPreferredSize(new Dimension(400, 120));
         setLayout(new BorderLayout());
+        setBackground(Theme.ACCENT);
 
         JLabel label = new JLabel("Drag files here to upload", SwingConstants.CENTER);
         label.setFont(label.getFont().deriveFont(Font.BOLD, 16f));
@@ -38,7 +40,7 @@ public class FileUpload extends JPanel {
 
                     for (File f : files) {
                         String fileExt = FileUtils.getFileExt(f.getName()).toLowerCase(Locale.ROOT);
-                        if (Constants.SUPPORTED_FILE_TYPES.contains(fileExt)) {
+                        if (Constants.SUPPORTED_READING_FILE_TYPES.contains(fileExt)) {
                             listener.onFileUploaded(f);
                         } else {
                             JOptionPane.showMessageDialog(null,

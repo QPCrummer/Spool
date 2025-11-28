@@ -4,9 +4,11 @@ import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.database.Tags;
 import io.github.qpcrummer.spool.file.FileRecord;
+import io.github.qpcrummer.spool.gui.ConvertMenu;
 import io.github.qpcrummer.spool.gui.FileManagerPopup;
 import io.github.qpcrummer.spool.gui.TagCheckboxList;
 import io.github.qpcrummer.spool.gui.VirtualFileList;
+import io.github.qpcrummer.spool.utils.LoggerUtils;
 import io.github.qpcrummer.spool.utils.Theme;
 
 import javax.swing.*;
@@ -53,7 +55,7 @@ public class Main {
         c.gridy = 0;
         c.gridwidth = 3;
         c.fill = GridBagConstraints.BOTH;
-        fileBar.setBackground(Theme.GRAY_MENU);
+        fileBar.setBackground(Theme.ACCENT);
         mainFrame.add(fileBar, c);
 
         // File Menu Options
@@ -72,6 +74,12 @@ public class Main {
         removeMenu.add(removeTag);
         fileBar.add(removeMenu);
 
+        JMenu convertMenu = new JMenu("Convert");
+        JMenuItem convertFile = new JMenuItem("Selected File");
+        convertFile.addActionListener(_ -> convertFiles());
+        convertMenu.add(convertFile);
+        fileBar.add(convertMenu);
+
         // Horizontal Divider
         JSeparator hDiv = new JSeparator();
         c.gridy = 1;
@@ -82,11 +90,11 @@ public class Main {
 
         // Control Panel
         JPanel controlPanel = new JPanel();
+        controlPanel.setBackground(Theme.LIGHT_GRAY_BACKGROUND);
         c.gridy = 2;
         c.weighty = 0.9;
         c.weightx = 0.3;
         c.gridwidth = 1;
-        controlPanel.setBackground(Theme.GRAY_MENU);
         renderControlPanel(controlPanel);
         mainFrame.add(controlPanel, c);
 
@@ -186,20 +194,30 @@ public class Main {
         fileManagerPopup.setVisible(true);
     }
 
+    static void convertFiles() {
+        if (Data.SELECTED_FILE != null) {
+            ConvertMenu convertMenu = new ConvertMenu();
+            convertMenu.setVisible(true);
+        }
+    }
+
     static void renderControlPanel(JPanel panel) {
         panel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.weightx = 1.0;
 
+        JPanel filterLabelPanel = new JPanel();
+        filterLabelPanel.setBackground(Theme.ACCENT);
         JLabel filterLabel = new JLabel("Filters");
+        filterLabelPanel.add(filterLabel);
         c.weighty = 0.05;
-        panel.add(filterLabel, c);
+        c.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(filterLabelPanel, c);
 
         renderTagsChecklist();
         c.gridy = 1;
         c.weighty = 0.4;
         c.fill = GridBagConstraints.BOTH;
-        filterCheckList.setBackground(Theme.GRAY_MENU);
         filterCheckList.setLayout(new BoxLayout(filterCheckList, BoxLayout.Y_AXIS));
 
         JScrollPane scroll = new JScrollPane(filterCheckList);

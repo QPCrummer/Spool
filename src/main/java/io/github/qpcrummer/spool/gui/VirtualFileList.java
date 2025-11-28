@@ -7,6 +7,7 @@ import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.utils.FileConverter;
 import io.github.qpcrummer.spool.utils.LoggerUtils;
+import io.github.qpcrummer.spool.utils.Theme;
 import io.github.qpcrummer.spool.utils.USBUtils;
 
 import javax.imageio.ImageIO;
@@ -37,6 +38,7 @@ public class VirtualFileList {
         searchButton.addActionListener(_ -> fuzzySearch(searchField.getText()));
         searchPanel.add(searchField);
         searchPanel.add(searchButton);
+        searchPanel.setBackground(Theme.ACCENT);
         mainPanel.add(searchPanel, BorderLayout.NORTH);
 
         // ---- List model ----
@@ -47,6 +49,7 @@ public class VirtualFileList {
 
         // ---- JList setup ----
         fileJList = new JList<>(listModel);
+        fileJList.setBackground(Theme.LIGHT_GRAY_BACKGROUND);
         fileJList.setCellRenderer(new FileCellRenderer());
         fileJList.setFixedCellHeight(80); // match previous entry height
         JScrollPane scrollPane = new JScrollPane(fileJList);
@@ -233,36 +236,6 @@ public class VirtualFileList {
         }
     }
 
-    private static BufferedImage multiStepResizeOld(BufferedImage img, int targetW, int targetH) {
-        int w = img.getWidth();
-        int h = img.getHeight();
-
-        BufferedImage current = img;
-
-        // Multi-step downscale: halve size repeatedly
-        while (w > targetW * 2 || h > targetH * 2) {
-            w = Math.max(targetW, w / 2);
-            h = Math.max(targetH, h / 2);
-
-            BufferedImage temp = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g = temp.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.drawImage(current, 0, 0, w, h, null);
-            g.dispose();
-
-            current = temp;
-        }
-
-        // Final high-quality bicubic pass
-        BufferedImage finalImg = new BufferedImage(targetW, targetH, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = finalImg.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
-        g.drawImage(current, 0, 0, targetW, targetH, null);
-        g.dispose();
-
-        return finalImg;
-    }
-
     private static BufferedImage multiStepResize(BufferedImage img, int targetW, int targetH) {
         int originalW = img.getWidth();
         int originalH = img.getHeight();
@@ -301,7 +274,7 @@ public class VirtualFileList {
     }
 
 
-    public static void updateThumbnail(String filename) {
+    public static void updateThumbnail() {
         fileJList.repaint();
         fileJList.revalidate();
     }
