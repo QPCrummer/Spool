@@ -1,3 +1,6 @@
 /.gradle
 /.idea
 /build
+*.db
+/files
+tags.json

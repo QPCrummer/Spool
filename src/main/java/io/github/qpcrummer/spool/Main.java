@@ -245,6 +245,18 @@ public class Main {
 
     static void updateTagsChecklist(String newTag) {
         JCheckBox box = new JCheckBox(newTag);
+        box.addActionListener(_ -> {
+            if (box.isSelected()) {
+                Data.ACTIVE_FILTERS.add(newTag);
+            } else {
+                Data.ACTIVE_FILTERS.remove(newTag);
+            }
+            try {
+                DBUtils.incrementalSearch(null, null, null, Data.ACTIVE_FILTERS);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         box.setBackground(Theme.GRAY_MENU);
         filterCheckList.add(box);
         filterCheckList.revalidate();

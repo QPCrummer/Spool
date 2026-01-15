@@ -4,11 +4,15 @@ import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.utils.FileUtils;
 import io.github.qpcrummer.spool.utils.LoggerUtils;
 import io.github.qpcrummer.spool.utils.Theme;
+import net.lingala.zip4j.ZipFile;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
-import java.io.File;
+import java.io.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 
 public class FileUpload extends JPanel {
@@ -40,7 +44,19 @@ public class FileUpload extends JPanel {
 
                     for (File f : files) {
                         String fileExt = FileUtils.getFileExt(f.getName()).toLowerCase(Locale.ROOT);
-                        if (Constants.SUPPORTED_READING_FILE_TYPES.contains(fileExt)) {
+                        // Handle zip files by extracting them
+                        if (fileExt.equals("zip")) {
+                            Path unzippedFolder = unzip(f, f.toPath());
+                            try (DirectoryStream<Path> stream = Files.newDirectoryStream(unzippedFolder)) {
+                                for (Path path : stream) {
+                                    String subFileExt = FileUtils.getFileExt(path.getFileName().toString()).toLowerCase(Locale.ROOT);
+                                    if (Constants.SUPPORTED_READING_FILE_TYPES.contains(subFileExt)) {
+                                        File file = path.toFile();
+                                        listener.onFileUploaded(file);
+                                    }
+                                }
+                            }
+                        } else if (Constants.SUPPORTED_READING_FILE_TYPES.contains(fileExt)) {
                             listener.onFileUploaded(f);
                         } else {
                             JOptionPane.showMessageDialog(null,
@@ -57,5 +73,17 @@ public class FileUpload extends JPanel {
                 return false;
             }
         });
+    }
+
+    private static Path unzip(File zipFile, Path zipPath) {
+        String dir = zipPath.getFileName().toString().replace(".zip", "");
+        Path output = zipPath.getParent().resolve(dir);
+
+        try (ZipFile convertedZip = new ZipFile(zipFile)) {
+            convertedZip.extractAll(output.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }

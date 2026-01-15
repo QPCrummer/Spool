@@ -38,7 +38,15 @@ public record Tags(Set<String> tags) {
     }
 
     public static void removeTags(List<String> names) {
-        names.forEach(Data.FILE_TAGS.tags()::remove);
+        names.forEach(tag -> {
+            try {
+                DBUtils.removeTagFromFiles(tag);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            Data.FILE_TAGS.tags().remove(tag);
+        });
+        DBUtils.repeatLastSearch();
         Data.FILE_TAGS.serialize();
     }
 }

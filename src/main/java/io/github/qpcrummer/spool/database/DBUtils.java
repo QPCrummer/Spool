@@ -5,6 +5,7 @@ import io.github.qpcrummer.spool.file.FileRecord;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -376,4 +377,32 @@ public class DBUtils {
         }
     }
 
+    public static void removeTagFromFiles(String tag) throws Exception {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:files.db")) {
+
+            // Get tag id
+            Integer tagId = null;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT id FROM tags WHERE name = ?"
+            )) {
+                ps.setString(1, tag);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    tagId = rs.getInt("id");
+                }
+            }
+
+            if (tagId == null) {
+                return; // Tag doesn't exist
+            }
+
+            // Delete all relations for this tag
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "DELETE FROM file_tags WHERE tag_id = ?"
+            )) {
+                ps.setInt(1, tagId);
+                ps.executeUpdate();
+            }
+        }
+    }
 }

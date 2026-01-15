@@ -62,10 +62,12 @@ public class VirtualFileList {
                 }
 
                 FileRecord file = listModel.get(index);
+
                 Rectangle cellBounds = fileJList.getCellBounds(index, index);
                 int relativeX = e.getX() - cellBounds.x;
                 int relativeY = e.getY() - cellBounds.y;
 
+                fileJList.setSelectedIndex(index);
                 Data.SELECTED_FILE = file;
                 Main.updateSelectedFile();
 
@@ -122,13 +124,14 @@ public class VirtualFileList {
 
         private final JLabel nameLabel = new JLabel();
         private final JLabel sellerLabel = new JLabel();
+        private final JPanel infoPanel;
 
         public FileCellRenderer() {
             setLayout(new BorderLayout());
             setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
             // Static text area
-            JPanel infoPanel = new JPanel();
+            infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
             infoPanel.add(nameLabel);
             infoPanel.add(sellerLabel);
@@ -174,6 +177,7 @@ public class VirtualFileList {
             // Name / seller text
             JPanel infoPanel = new JPanel();
             infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+
             nameLabel.setText("Name: " + file.path());
             sellerLabel.setText("Seller: " + file.seller());
             infoPanel.add(nameLabel);
@@ -198,7 +202,15 @@ public class VirtualFileList {
             rightPanel.setPreferredSize(new Dimension(BUTTON_WIDTH, 2 * BUTTON_HEIGHT));
             add(rightPanel, BorderLayout.EAST);
 
-            setBackground(isSelected ? Color.LIGHT_GRAY : Color.WHITE);
+            if (isSelected) {
+                infoPanel.setBackground(Theme.SELECTED);
+                rightPanel.setBackground(Theme.SELECTED);
+                setBackground(Theme.SELECTED);
+            } else {
+                infoPanel.setBackground(Color.WHITE);
+                rightPanel.setBackground(Color.WHITE);
+                setBackground(Color.WHITE);
+            }
 
             return this;
         }

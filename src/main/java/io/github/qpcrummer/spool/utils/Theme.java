@@ -7,4 +7,5 @@ public final class Theme {
     public static Color LIGHT_GRAY_BACKGROUND = new Color(190, 190, 190);
     public static Color BACKGROUND = new Color(65, 65, 65);
     public static Color ACCENT = new Color(132, 215, 250);
+    public static Color SELECTED = new Color(182, 245, 250);
 }

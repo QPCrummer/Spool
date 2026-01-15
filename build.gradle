@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.github.qpcrummer'
-version = '1.0.0'
+version = '1.1.0'
 
 repositories {
     mavenCentral()
@@ -17,6 +17,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-simple:2.0.17'
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'org.apache.pdfbox:pdfbox:3.0.6'
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
 }
 
 tasks.shadowJar {
