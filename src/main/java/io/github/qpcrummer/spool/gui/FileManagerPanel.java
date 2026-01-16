@@ -78,7 +78,7 @@ public class FileManagerPanel extends JPanel {
                         // Copy file
                         copyFile(desc.getFilePath());
                         // Generate thumbnail
-                        FileConverter.generateThumbnailAsync(desc.getFileName());
+                        // FileConverter.processImageConversions();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }

@@ -46,7 +46,7 @@ public class FileUpload extends JPanel {
                         String fileExt = FileUtils.getFileExt(f.getName()).toLowerCase(Locale.ROOT);
                         // Handle zip files by extracting them
                         if (fileExt.equals("zip")) {
-                            Path unzippedFolder = unzip(f, f.toPath());
+                            Path unzippedFolder = FileUtils.unzip(f, f.toPath());
                             try (DirectoryStream<Path> stream = Files.newDirectoryStream(unzippedFolder)) {
                                 for (Path path : stream) {
                                     String subFileExt = FileUtils.getFileExt(path.getFileName().toString()).toLowerCase(Locale.ROOT);
@@ -73,17 +73,5 @@ public class FileUpload extends JPanel {
                 return false;
             }
         });
-    }
-
-    private static Path unzip(File zipFile, Path zipPath) {
-        String dir = zipPath.getFileName().toString().replace(".zip", "");
-        Path output = zipPath.getParent().resolve(dir);
-
-        try (ZipFile convertedZip = new ZipFile(zipFile)) {
-            convertedZip.extractAll(output.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return output;
     }
 }

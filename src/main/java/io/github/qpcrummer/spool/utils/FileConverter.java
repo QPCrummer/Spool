@@ -4,7 +4,6 @@ import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.file.FileRecord;
-import io.github.qpcrummer.spool.gui.VirtualFileList;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -13,75 +12,55 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class FileConverter {
-    private static final ExecutorService EXECUTOR =
-            Executors.newCachedThreadPool();
 
     /**
-     * Asynchronously generates a PNG thumbnail from an embroidery file.
-     *
-     * @param embroideryFileName The source file name after being moved
+     * Processes a list of File names and generates their thumbnails concurrently
+     * @param filesNames The names of the files to be processed
      */
-    public static void generateThumbnailAsync(
-            String embroideryFileName
-    ) {
-
-        EXECUTOR.submit(() -> {
-            String pngFileName = embroideryFileName.replaceAll("\\.[^.]+$", "") + ".png";
-
-            if (embroideryFileName.contains(".pdf")) {
-                generateThumbnailPDF(Constants.FILES.resolve(embroideryFileName), Constants.FILES.resolve(pngFileName));
-                // Update thumbnail
-                SwingUtilities.invokeLater(VirtualFileList::updateThumbnail);
-            } else {
-                // Python one-liner script
-                String script =
-                        "import pystitch\n" +
-                                "p=pystitch.read(r'" + embroideryFileName + "')\n" +
-                                "pystitch.write(p, r'" + pngFileName + "')\n";
-
-                try {
-                    ProcessBuilder pb = new ProcessBuilder(
-                            "python", "-c", script
-                    );
-
-                    pb.redirectErrorStream(true);
-                    pb.directory(Constants.FILES.toFile());
-                    Process process = pb.start();
-
-                    int exit = process.waitFor();
-                    if (exit != 0) {
-                        throw new IOException("Thumbnail generation failed: exit code " + exit);
-                    }
-
-                    // Update thumbnail
-                    SwingUtilities.invokeLater(VirtualFileList::updateThumbnail);
-                } catch (Exception ex) {
-                    LoggerUtils.LOGGER.warn("Failed to generate thumbnail", ex);
-                }
-            }
-        });
+    public static void processImageConversions(List<String> filesNames) {
+        filesNames.parallelStream().forEach(FileConverter::generateThumbnail);
+        // TODO Update thumbnails
     }
-    public static File getThumbnail(File embroideryFile) {
-        File pngFile = new File(
-                embroideryFile.getParent(),
-                embroideryFile.getName().replaceAll("\\.[^.]+$", "") + ".png"
-        );
 
-        // If thumbnail exists and is newer than source → use cached
-        if (pngFile.exists()) {
-            return pngFile;
+    /**
+     * Generates a PNG thumbnail from an embroidery file.
+     * @param embroideryFileName The source file path after being moved
+     */
+    private static void generateThumbnail(String embroideryFileName) {
+        String pngFileName = embroideryFileName.replaceAll("\\.[^.]+$", "") + ".png";
+
+        if (embroideryFileName.contains(".pdf")) {
+            generateThumbnailPDF(Constants.FILES.resolve(embroideryFileName), Constants.FILES.resolve(pngFileName));
+        } else {
+            // Python one-liner script
+            String script =
+                    "import pystitch\n" +
+                            "p=pystitch.read(r'" + embroideryFileName + "')\n" +
+                            "pystitch.write(p, r'" + pngFileName + "')\n";
+
+            try {
+                ProcessBuilder pb = new ProcessBuilder(
+                        "python", "-c", script
+                );
+
+                pb.redirectErrorStream(true);
+                pb.directory(Constants.FILES.toFile());
+                Process process = pb.start();
+
+                int exit = process.waitFor();
+                if (exit != 0) {
+                    throw new IOException("Thumbnail generation failed: exit code " + exit);
+                }
+            } catch (Exception ex) {
+                LoggerUtils.LOGGER.warn("Failed to generate thumbnail", ex);
+            }
         }
-
-        // Not found
-        return null;
     }
 
     private static void generateThumbnailPDF(Path pdfPath, Path pngPath) {

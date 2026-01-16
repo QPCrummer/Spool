@@ -3,11 +3,11 @@ package io.github.qpcrummer.spool;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.database.Tags;
-import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.gui.ConvertMenu;
 import io.github.qpcrummer.spool.gui.FileManagerPopup;
 import io.github.qpcrummer.spool.gui.TagCheckboxList;
 import io.github.qpcrummer.spool.gui.VirtualFileList;
+import io.github.qpcrummer.spool.gui_2.MainGUI;
 import io.github.qpcrummer.spool.utils.Theme;
 
 import javax.swing.*;
@@ -24,6 +24,7 @@ public class Main {
     private static JFrame mainFrame;
     private static VirtualFileList fileList;
     private static final JPanel selectedFileDataPanel = new JPanel();
+    private static Thread guiThread;
 
     public static void main(String[] args) {
         // Set up DB
@@ -31,6 +32,10 @@ public class Main {
 
         // Create files directory
         createFilesDirectory();
+
+        // New main window setup
+        guiThread = new Thread(() -> MainGUI.init(args));
+        guiThread.start();
 
         // Main window setup
         mainFrame = new JFrame();
@@ -288,10 +293,6 @@ public class Main {
             box.setBackground(Theme.GRAY_MENU);
             filterCheckList.add(box);
         }
-    }
-
-    public static void updateSearchList(List<FileRecord> files) {
-        fileList.updateFiles(files);
     }
 
     public static void updateSelectedFile() {

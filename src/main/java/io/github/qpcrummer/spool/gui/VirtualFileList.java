@@ -223,7 +223,7 @@ public class VirtualFileList {
 
     private static void renderThumbnail(String file, JPanel imagePanel, Dimension dim) {
         File embroideryFile = Constants.FILES.resolve(file).toFile();
-        File png = FileConverter.getThumbnail(embroideryFile);
+        File png = null;
 
         if (png != null && png.exists()) {
             try {

@@ -1,11 +1,10 @@
 package io.github.qpcrummer.spool.database;
 
-import io.github.qpcrummer.spool.Main;
 import io.github.qpcrummer.spool.file.FileRecord;
+import io.github.qpcrummer.spool.gui_2.FilePanel;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -285,12 +284,12 @@ public class DBUtils {
         }
 
         // Update main UI
-        Main.updateSearchList(results);
+        FilePanel.updateSearchList(results);
     }
 
     public static void repeatLastSearch() {
         if (previousQuery == null) {
-            Main.updateSearchList(Database.getAllFiles());
+            FilePanel.updateSearchList(Database.getAllFiles());
         } else {
             try {
                 searchFiles(previousQuery.seller(), previousQuery.fileNameLike(), previousQuery.fileType(), previousQuery.requiredTags());
@@ -405,4 +404,47 @@ public class DBUtils {
             }
         }
     }
+
+    public static void updateTagName(String oldName, String newName) throws Exception {
+        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:files.db")) {
+
+            // Check that oldName exists
+            Integer tagId = null;
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT id FROM tags WHERE name = ?"
+            )) {
+                ps.setString(1, oldName);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    tagId = rs.getInt("id");
+                }
+            }
+
+            if (tagId == null) {
+                // Tag isn't found
+                return;
+            }
+
+            // Ensure newName isn't already used
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "SELECT COUNT(*) AS count FROM tags WHERE name = ?"
+            )) {
+                ps.setString(1, newName);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next() && rs.getInt("count") > 0) {
+                    throw new Exception("Tag name already exists: " + newName);
+                }
+            }
+
+            // Update tag name
+            try (PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE tags SET name = ? WHERE id = ?"
+            )) {
+                ps.setString(1, newName);
+                ps.setInt(2, tagId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
 }

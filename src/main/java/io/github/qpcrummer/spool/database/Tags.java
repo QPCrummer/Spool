@@ -2,6 +2,7 @@ package io.github.qpcrummer.spool.database;
 
 import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.Data;
+import io.github.qpcrummer.spool.gui_2.FilePanel;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -35,6 +36,7 @@ public record Tags(Set<String> tags) {
     public static void createTag(String name) {
         Data.FILE_TAGS.tags.add(name);
         Data.FILE_TAGS.serialize();
+        FilePanel.rebuildFilterMenu();
     }
 
     public static void removeTags(List<String> names) {
@@ -48,5 +50,6 @@ public record Tags(Set<String> tags) {
         });
         DBUtils.repeatLastSearch();
         Data.FILE_TAGS.serialize();
+        FilePanel.rebuildFilterMenu();
     }
 }
