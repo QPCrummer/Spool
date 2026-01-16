@@ -1,10 +1,10 @@
-package io.github.qpcrummer.spool.gui_2;
+package io.github.qpcrummer.spool.gui;
 
 import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.file.FileRecord;
-import io.github.qpcrummer.spool.gui_2.file_list.FileItemDelegate;
-import io.github.qpcrummer.spool.gui_2.file_list.FileListModel;
+import io.github.qpcrummer.spool.gui.file_list.FileItemDelegate;
+import io.github.qpcrummer.spool.gui.file_list.FileListModel;
 import io.qt.core.QItemSelection;
 import io.qt.core.QMetaObject;
 import io.qt.core.QModelIndex;
@@ -39,16 +39,13 @@ public class FilePanel {
         layout.setContentsMargins(0, 0, 0, 0);
         layout.setSpacing(6);
 
-        // Search field
         QLineEdit searchField = new QLineEdit();
         searchField.setPlaceholderText("Search...");
         searchField.returnPressed.connect(() -> performSearch(searchField.text()));
 
-        // Search button
         QPushButton searchButton = new QPushButton("Search");
         searchButton.clicked.connect(() -> performSearch(searchField.text()));
 
-        // Filter dropdown
         QToolButton filterButton = new QToolButton();
         filterButton.setText("Filters");
         filterButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup);
@@ -77,20 +74,15 @@ public class FilePanel {
         filterMenu.clear();
 
         for (String tag : Data.FILE_TAGS.tags()) {
-            // Create a checkbox for the filter
             QCheckBox checkBox = new QCheckBox(tag);
 
-            // Restore state if active
             checkBox.setChecked(Data.ACTIVE_FILTERS.contains(tag));
 
-            // Connect toggled signal
             checkBox.toggled.connect(checked -> applyFilter(tag, checked));
 
-            // Create a QWidgetAction to hold the checkbox
             QWidgetAction widgetAction = new QWidgetAction(filterMenu);
             widgetAction.setDefaultWidget(checkBox);
 
-            // Add the action (with embedded checkbox) to the menu
             filterMenu.addAction(widgetAction);
         }
     }
@@ -112,9 +104,8 @@ public class FilePanel {
         }
     }
 
-    // List
     public static QListView createFileListView() {
-        listView.setMouseTracking(true); // enables hover
+        listView.setMouseTracking(true);
 
         model = new FileListModel();
         listView.setModel(model);
@@ -125,12 +116,13 @@ public class FilePanel {
         listView.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection);
 
         listView.setStyleSheet("""
-        QListView {
-            background-color: #1e1e1e;
-            border: none;
-        }
-    """);
+            QListView {
+                background-color: #1e1e1e;
+                border: none;
+            }
+        """);
 
+        // Update on selected
         listView.selectionModel().selectionChanged.connect((QItemSelection selected, QItemSelection _) -> {
             if (!selected.indexes().isEmpty()) {
                 QModelIndex index = selected.indexes().getFirst();
@@ -155,7 +147,7 @@ public class FilePanel {
 
     /**
      * Update using this method when a filter is applied
-     * @param filteredFiles
+     * @param filteredFiles The new files to show
      */
     public static void updateSearchList(List<FileRecord> filteredFiles) {
         QMetaObject.invokeMethod(

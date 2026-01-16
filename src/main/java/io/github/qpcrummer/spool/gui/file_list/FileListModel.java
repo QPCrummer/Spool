@@ -1,4 +1,4 @@
-package io.github.qpcrummer.spool.gui_2.file_list;
+package io.github.qpcrummer.spool.gui.file_list;
 
 import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.file.FileRecord;
@@ -29,7 +29,6 @@ public class FileListModel extends QAbstractListModel {
         return new QVariant();
     }
 
-    // ---- ADD ----
     public void addFile(FileRecord file) {
         int row = files.size();
         beginInsertRows(new QModelIndex(), row, row);
@@ -37,7 +36,6 @@ public class FileListModel extends QAbstractListModel {
         endInsertRows();
     }
 
-    // ---- REMOVE BY INDEX ----
     public void removeFileAt(int index) {
         if (index < 0 || index >= files.size()) {
             return;
@@ -48,7 +46,6 @@ public class FileListModel extends QAbstractListModel {
         endRemoveRows();
     }
 
-    // ---- REMOVE BY ID ----
     public void removeFileById(int id) {
         for (int i = 0; i < files.size(); i++) {
             if (files.get(i).id() == id) {
@@ -56,20 +53,6 @@ public class FileListModel extends QAbstractListModel {
                 return;
             }
         }
-    }
-
-    // ---- OPTIONAL: BATCH INSERT ----
-    public void addFiles(List<FileRecord> newFiles) {
-        if (newFiles.isEmpty()) {
-            return;
-        }
-
-        int start = files.size();
-        int end = start + newFiles.size() - 1;
-
-        beginInsertRows(new QModelIndex(), start, end);
-        files.addAll(newFiles);
-        endInsertRows();
     }
 
     public void updateFile(QModelIndex index, FileRecord updated) {
@@ -86,7 +69,6 @@ public class FileListModel extends QAbstractListModel {
         dataChanged.emit(index, index);
     }
 
-    // ---- FULL REPLACEMENT (FILTER RESULT) ----
     public void setFiles(List<FileRecord> newFiles) {
         beginResetModel();
         files.clear();

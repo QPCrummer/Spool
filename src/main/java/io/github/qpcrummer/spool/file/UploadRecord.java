@@ -10,7 +10,7 @@ public class UploadRecord {
     private FileRecord fileRecord;
     private Path path;
     private final List<String> tags = new ArrayList<>();
-    private QToolButton tagButton; // add getter/setter
+    private QToolButton tagButton;
 
     public UploadRecord(FileRecord fileRecord, Path path) {
         this.fileRecord = fileRecord;

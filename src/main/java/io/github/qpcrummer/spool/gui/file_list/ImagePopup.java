@@ -1,4 +1,4 @@
-package io.github.qpcrummer.spool.gui_2.file_list;
+package io.github.qpcrummer.spool.gui.file_list;
 
 import io.qt.core.Qt;
 import io.qt.gui.QPixmap;

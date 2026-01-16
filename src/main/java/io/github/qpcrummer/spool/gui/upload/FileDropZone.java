@@ -1,4 +1,4 @@
-package io.github.qpcrummer.spool.gui_2.upload;
+package io.github.qpcrummer.spool.gui.upload;
 
 import io.qt.core.QUrl;
 import io.qt.core.Qt;
@@ -24,11 +24,11 @@ public class FileDropZone extends QWidget {
         setAttribute(Qt.WidgetAttribute.WA_StyledBackground, true);
 
         setStyleSheet("""
-        QWidget {
-            border: 2px solid #0078d7;
-            border-radius: 6px;
-            background-color: #444444;
-        }
+            QWidget {
+                border: 2px solid #0078d7;
+                border-radius: 6px;
+                background-color: #444444;
+            }
         """);
     }
 

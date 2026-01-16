@@ -1,11 +1,11 @@
-package io.github.qpcrummer.spool.gui_2;
+package io.github.qpcrummer.spool.gui;
 
 import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.file.UploadRecord;
-import io.github.qpcrummer.spool.gui_2.upload.FileDropZone;
+import io.github.qpcrummer.spool.gui.upload.FileDropZone;
 import io.github.qpcrummer.spool.utils.FileConverter;
 import io.github.qpcrummer.spool.utils.FileUtils;
 import io.qt.core.Qt;
@@ -28,7 +28,6 @@ public class UploadPanel {
         QVBoxLayout layout = new QVBoxLayout(panel);
         layout.setSpacing(8);
 
-        // ---- DROP ZONE ----
         QVBoxLayout dropWrapper = new QVBoxLayout();
         dropWrapper.setAlignment(Qt.AlignmentFlag.AlignCenter);
 
@@ -37,12 +36,11 @@ public class UploadPanel {
         listLayout.setSpacing(6);
         listLayout.setAlignment(Qt.AlignmentFlag.AlignTop);
 
-        FileDropZone dropZone = new FileDropZone(paths -> paths.forEach(path -> handleFileUpload(path, listLayout, UPLOAD_RECORDS)));
+        FileDropZone dropZone = new FileDropZone(paths -> paths.forEach(path -> handleFileUpload(path, listLayout)));
 
         dropWrapper.addWidget(dropZone);
         layout.addLayout(dropWrapper);
 
-        // ---- SCROLLABLE LIST ----
         QScrollArea scrollArea = new QScrollArea();
         scrollArea.setWidgetResizable(true);
         scrollArea.setWidget(listContainer);
@@ -50,7 +48,6 @@ public class UploadPanel {
 
         layout.addWidget(scrollArea, 1);
 
-        // ---- UPLOAD BUTTON ----
         QPushButton uploadButton = new QPushButton("Upload");
         uploadButton.clicked.connect(() -> {
             List<UploadRecord> trimmed = UPLOAD_RECORDS.stream()
@@ -60,9 +57,7 @@ public class UploadPanel {
             for (UploadRecord file : trimmed) {
                 try {
                     DBUtils.addFile(file.getFileRecord().path(), file.getFileRecord().fileType(), file.getFileRecord().seller(), file.getTags());
-                    // Copy file
                     copyFile(file.getPath());
-                    // Add file to list
                     FilePanel.getModel().addFile(file.getFileRecord());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -72,7 +67,6 @@ public class UploadPanel {
             clearLayout(listLayout);
             UPLOAD_RECORDS.clear();
 
-            // Generate thumbnails
             List<String> names = trimmed.stream().map(uploadRecord -> uploadRecord.getFileRecord().path()).toList();
             FileConverter.processImageConversions(names);
         });
@@ -101,7 +95,7 @@ public class UploadPanel {
         }
     }
 
-    private static void handleFileUpload(String pathStr, QVBoxLayout listLayout, List<UploadRecord> uploadedFiles) {
+    private static void handleFileUpload(String pathStr, QVBoxLayout listLayout) {
         String fileName = FileUtils.getFileName(pathStr);
         String fileExt = FileUtils.getFileExt(fileName).toLowerCase(Locale.ROOT);
         if (fileExt.equals("zip")) {
@@ -114,7 +108,7 @@ public class UploadPanel {
                         String subFileName = FileUtils.getFileName(path.getFileName().toString());
                         FileRecord fRecord = new FileRecord(-1, subFileName, subFileExt, "");
                         UploadRecord record = new UploadRecord(fRecord, path);
-                        addUploadEntry(listLayout, uploadedFiles, record);
+                        addUploadEntry(listLayout, record);
                     }
                 }
             } catch (IOException e) {
@@ -123,7 +117,7 @@ public class UploadPanel {
         } else if (Constants.SUPPORTED_READING_FILE_TYPES.contains(fileExt)) {
             FileRecord fRecord = new FileRecord(-1, fileName, fileExt, "");
             UploadRecord record = new UploadRecord(fRecord, Paths.get(pathStr));
-            addUploadEntry(listLayout, uploadedFiles, record);
+            addUploadEntry(listLayout, record);
         } else {
             // TODO Show error panel
         }
@@ -132,22 +126,20 @@ public class UploadPanel {
     private static QWidget createUploadEntry(UploadRecord record) {
         QWidget row = new QWidget();
         row.setStyleSheet("""
-        QWidget {
-            background-color: #1e1e1e;
-            border-radius: 4px;
-        }
-    """);
+            QWidget {
+                background-color: #1e1e1e;
+                border-radius: 4px;
+            }
+        """);
 
         QVBoxLayout mainLayout = new QVBoxLayout(row);
         mainLayout.setContentsMargins(6, 6, 6, 6);
         mainLayout.setSpacing(4);
 
-        // ---------- Row 1: File name ----------
         QLineEdit fileName = new QLineEdit(record.getFileRecord().path());
         fileName.setReadOnly(true);
         mainLayout.addWidget(fileName);
 
-        // ---------- Row 2: Author ----------
         QHBoxLayout authorLayout = new QHBoxLayout();
         authorLayout.setSpacing(4);
 
@@ -168,7 +160,6 @@ public class UploadPanel {
         authorLayout.addWidget(author, 1);
         mainLayout.addLayout(authorLayout);
 
-        // ---------- Row 3: Tags + X ----------
         QHBoxLayout bottomLayout = new QHBoxLayout();
         bottomLayout.setSpacing(4);
 
@@ -194,14 +185,14 @@ public class UploadPanel {
 
         QPushButton remove = new QPushButton("✕");
         remove.setStyleSheet("""
-        color: red;
-        font-weight: bold;
-    """);
+            color: red;
+            font-weight: bold;
+        """);
         remove.setFixedSize(24, 24);
         remove.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed);
 
         bottomLayout.addWidget(tagButton, 0);
-        bottomLayout.addStretch(1); // push remove to right
+        bottomLayout.addStretch(1);
         bottomLayout.addWidget(remove, 0);
 
         mainLayout.addLayout(bottomLayout);
@@ -211,17 +202,16 @@ public class UploadPanel {
 
     private static void addUploadEntry(
             QVBoxLayout listLayout,
-            List<UploadRecord> uploadedFiles,
             UploadRecord record
     ) {
         QWidget row = createUploadEntry(record);
 
-        uploadedFiles.add(record);
+        UploadPanel.UPLOAD_RECORDS.add(record);
 
         Runnable removeAction = () -> {
             listLayout.removeWidget(row);
             row.dispose();
-            uploadedFiles.remove(record);
+            UploadPanel.UPLOAD_RECORDS.remove(record);
         };
 
         QPushButton removeButton = row.findChild(QPushButton.class);
@@ -240,7 +230,7 @@ public class UploadPanel {
 
     private static void rebuildUploadTagsMenu(UploadRecord record, QToolButton tagButton) {
         QMenu tagMenu = tagButton.menu();
-        tagMenu.clear(); // remove all old actions
+        tagMenu.clear();
 
         for (String tag : Data.FILE_TAGS.tags()) {
             QCheckBox checkBox = new QCheckBox(tag);

@@ -1,4 +1,4 @@
-package io.github.qpcrummer.spool.gui_2.file_list;
+package io.github.qpcrummer.spool.gui.file_list;
 
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.qt.core.*;
@@ -17,32 +17,27 @@ public class FileItemDelegate extends QStyledItemDelegate {
     public void paint(QPainter painter, QStyleOptionViewItem option, QModelIndex index) {
         painter.save();
 
-        // Extract the record
         FileRecord file = (FileRecord) index.data(Qt.ItemDataRole.UserRole);
 
-        // Set rectangle
         QRect rect = option.rect();
 
-        // Draw background
         if (option.state().testFlag(QStyle.StateFlag.State_Selected)) {
-            painter.setBrush(new QBrush(new QColor("#0078d7"))); // blue selection outline
+            painter.setBrush(new QBrush(new QColor("#0078d7")));
             painter.setPen(Qt.PenStyle.NoPen);
             painter.drawRect(rect.adjusted(0, 0, -1, -1));
         } else if (option.state().testFlag(QStyle.StateFlag.State_MouseOver)) {
-            painter.setBrush(new QBrush(new QColor("#333333"))); // hover
+            painter.setBrush(new QBrush(new QColor("#333333")));
             painter.setPen(Qt.PenStyle.NoPen);
             painter.drawRect(rect.adjusted(0, 0, -1, -1));
         } else {
-            painter.setBrush(new QBrush(new QColor("#1e1e1e"))); // default background
+            painter.setBrush(new QBrush(new QColor("#1e1e1e")));
             painter.setPen(Qt.PenStyle.NoPen);
             painter.drawRect(rect.adjusted(0, 0, -1, -1));
         }
 
-        // Draw border around the entry
         painter.setPen(new QPen(QColor.fromString("black"), 1));
         painter.drawRect(rect.adjusted(0, 0, -1, -1));
 
-        // Draw text (name and author)
         painter.setPen(new QColor("white"));
         QFont font = painter.font();
         font.setBold(true);
@@ -54,7 +49,6 @@ public class FileItemDelegate extends QStyledItemDelegate {
         painter.setFont(font);
         painter.drawText(rect.adjusted(6, 30, -54, -6), file.seller(), Qt.AlignmentFlag.AlignLeft.combined(Qt.AlignmentFlag.AlignVCenter));
 
-        // Image
         QRect imageRect = new QRect(rect.right() - 128 - 4, rect.top() + 4, 120, 120);
         String thumbPath = file.getThumbnailPath();
         if (thumbPath == null) {
@@ -109,7 +103,6 @@ public class FileItemDelegate extends QStyledItemDelegate {
             );
 
             if (imageRect.contains(mouseEvent.pos())) {
-                // Load full image
                 String thumbPath = file.getThumbnailPath();
                 if (thumbPath != null) {
                     QPixmap fullImage = new QPixmap(thumbPath);

@@ -1,10 +1,10 @@
-package io.github.qpcrummer.spool.gui_2;
+package io.github.qpcrummer.spool.gui;
 
 import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.file.FileRecord;
-import io.github.qpcrummer.spool.gui_2.file_list.FileItemDelegate;
+import io.github.qpcrummer.spool.gui.file_list.FileItemDelegate;
 import io.qt.gui.QTextOption;
 import io.qt.widgets.*;
 
@@ -22,20 +22,18 @@ public class InfoPanel {
         layout.setContentsMargins(6, 6, 6, 6);
         layout.setSpacing(6);
 
-        // ---------- File name ----------
         fileNameEdit = new QTextEdit();
         fileNameEdit.setReadOnly(true);
-        fileNameEdit.setWordWrapMode(QTextOption.WrapMode.WrapAnywhere); // wrap text
-        fileNameEdit.setFixedHeight(50); // adjust height as needed
+        fileNameEdit.setWordWrapMode(QTextOption.WrapMode.WrapAnywhere);
+        fileNameEdit.setFixedHeight(50);
         fileNameEdit.setStyleSheet("""
-        background-color: #3a3a3a;
-        color: white;
-        border-radius: 4px;
+            background-color: #3a3a3a;
+            color: white;
+            border-radius: 4px;
         """);
         layout.addWidget(new QLabel("File:"));
         layout.addWidget(fileNameEdit);
 
-        // ---------- Seller ----------
         sellerEdit = new QLineEdit();
         sellerEdit.setStyleSheet("""
             background-color: #444444;
@@ -52,7 +50,6 @@ public class InfoPanel {
         layout.addWidget(new QLabel("Seller:"));
         layout.addWidget(sellerEdit);
 
-        // ---------- Tags ----------
         QHBoxLayout tagLayout = new QHBoxLayout();
         QToolButton tagButton = new QToolButton();
         tagButton.setText("Tags");
@@ -64,7 +61,6 @@ public class InfoPanel {
 
         layout.addLayout(tagLayout);
 
-        // ---------- Buttons ----------
         QHBoxLayout buttonLayout = new QHBoxLayout();
         QPushButton convertButton = new QPushButton("Convert");
         QPushButton deleteButton = new QPushButton("Delete");
@@ -92,7 +88,10 @@ public class InfoPanel {
         return panel;
     }
 
-    /** Call this whenever a new file is selected in the File List Panel */
+    /**
+     * Call this whenever a new file is selected in the File List Panel
+     * @param file File to set selected
+     */
     public static void setSelectedFile(FileRecord file) {
         Data.SELECTED_FILE = file;
         Data.SELECTED_FILE_TAGS.clear();
@@ -102,7 +101,9 @@ public class InfoPanel {
         rebuildTagMenu();
     }
 
-    /** Rebuild tag dropdown, preserving selected tags */
+    /**
+     * Rebuild tag dropdown, preserving selected tags
+     */
     public static void rebuildTagMenu() {
         tagMenu.clear();
         if (Data.SELECTED_FILE == null) {
@@ -129,7 +130,9 @@ public class InfoPanel {
         }
     }
 
-    /** Clear panel when no file is selected */
+    /**
+     * Clear panel when no file is selected
+     */
     public static void clear() {
         Data.SELECTED_FILE = null;
         Data.SELECTED_FILE_TAGS.clear();

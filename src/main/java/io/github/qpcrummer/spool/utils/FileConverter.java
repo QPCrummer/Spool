@@ -80,6 +80,11 @@ public class FileConverter {
         }
     }
 
+    /**
+     * Converts between two file types. The original file is not changed.
+     * @param file Input file
+     * @param toFileType Type of file to convert to
+     */
     public static void convert(FileRecord file, String toFileType) {
         String convertedFile = file.path().replaceAll("\\.[^.]+$", "") + "." + toFileType.toLowerCase(Locale.ROOT);
 

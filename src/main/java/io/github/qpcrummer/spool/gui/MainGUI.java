@@ -1,5 +1,6 @@
-package io.github.qpcrummer.spool.gui_2;
+package io.github.qpcrummer.spool.gui;
 
+import io.github.qpcrummer.spool.utils.LoggerUtils;
 import io.qt.core.Qt;
 import io.qt.gui.QIcon;
 import io.qt.gui.QPixmap;
@@ -22,25 +23,23 @@ public class MainGUI {
     private static QMainWindow createMainWindow() {
         QMainWindow window = new QMainWindow();
         window.setWindowTitle("Spool");
-        InputStream iconStream;
-        try {
-            iconStream = MainGUI.class.getResource("/SpoolIcon.png").openStream();
+        try (InputStream iconStream = MainGUI.class.getResource("/SpoolIcon.png").openStream()) {
+            if (iconStream != null) {
+                byte[] bytes;
+                try {
+                    bytes = iconStream.readAllBytes();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                QPixmap pixmap = new QPixmap();
+                pixmap.loadFromData(bytes);
+                QIcon icon = new QIcon(pixmap);
+                window.setWindowIcon(icon);
+            } else {
+                LoggerUtils.LOGGER.warn("Icon not found");
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        if (iconStream != null) {
-            byte[] bytes;
-            try {
-                bytes = iconStream.readAllBytes();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            QPixmap pixmap = new QPixmap();
-            pixmap.loadFromData(bytes);
-            QIcon icon = new QIcon(pixmap);
-            window.setWindowIcon(icon);
-        } else {
-            System.err.println("Icon not found!");
         }
         window.resize(1200, 800);
 

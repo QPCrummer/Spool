@@ -10,6 +10,9 @@ import java.util.List;
 public class Database {
     private static final String URL = "jdbc:sqlite:files.db";
 
+    /**
+     * Initializes the database
+     */
     public static void init() {
         try (Connection conn = DriverManager.getConnection(URL)) {
 
@@ -50,6 +53,10 @@ public class Database {
         }
     }
 
+    /**
+     * Gets all files in the database
+     * @return List of all files in the database
+     */
     public static List<FileRecord> getAllFiles() {
         List<FileRecord> files = new ArrayList<>();
 
@@ -75,6 +82,11 @@ public class Database {
         return files;
     }
 
+    /**
+     * Gets all the tags for a file
+     * @param fileId File's id {@link FileRecord#id()}
+     * @return List of file's tags
+     */
     public static List<String> getTagsForFile(int fileId) {
         List<String> tags = new ArrayList<>();
 

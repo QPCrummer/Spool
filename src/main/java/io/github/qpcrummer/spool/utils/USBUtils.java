@@ -14,7 +14,7 @@ public class USBUtils {
      * Attempts to find a removable USB drive on Windows or Linux.
      * Returns the root directory of the drive, or null if none found.
      */
-    public static File detectUSBDrive() {
+    private static File detectUSBDrive() {
 
         String os = System.getProperty("os.name").toLowerCase();
 
@@ -25,7 +25,7 @@ public class USBUtils {
         }
     }
 
-    // --------------------- WINDOWS -----------------------
+    // Windows
     private static File detectUSBWindows() {
         FileSystemView fsv = FileSystemView.getFileSystemView();
         File[] roots = File.listRoots();
@@ -44,7 +44,7 @@ public class USBUtils {
         return null;
     }
 
-    // --------------------- LINUX -------------------------
+    // Linux
     private static File detectUSBLinux() {
         List<File> possibleRoots = new ArrayList<>();
 
@@ -69,6 +69,11 @@ public class USBUtils {
         return null;
     }
 
+    /**
+     * Tries to copy a file to a USB
+     * @param sourceFile File to copy
+     * @return If the copy was successful
+     */
     public static boolean copyFileToUSB(Path sourceFile) {
         File usb = detectUSBDrive();
 

@@ -11,6 +11,24 @@ repositories {
     mavenCentral()
 }
 
+def osName = System.getProperty("os.name").toLowerCase()
+
+// Allow manual override: -Pplatform=windows|linux|macos
+def platform = project.findProperty("platform")
+
+def resolvedPlatform
+if (platform != null) {
+    resolvedPlatform = ((String) platform).toLowerCase()
+} else if (osName.contains("win")) {
+    resolvedPlatform = "windows"
+} else if (osName.contains("linux")) {
+    resolvedPlatform = "linux"
+} else if (osName.contains("mac")) {
+    resolvedPlatform = "macos"
+} else {
+    throw new GradleException("Unsupported OS: " + osName)
+}
+
 dependencies {
     implementation 'org.xerial:sqlite-jdbc:3.51.0.0'
     implementation 'org.slf4j:slf4j-api:2.0.17'
@@ -19,10 +37,15 @@ dependencies {
     implementation 'org.apache.pdfbox:pdfbox:3.0.6'
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
     implementation("io.qtjambi:qtjambi:6.10.1")
-    implementation("io.qtjambi:qtjambi-concurrent:6.10.1")
-    implementation("io.qtjambi:qtjambi-native-windows-x64:6.10.1")
-    implementation("io.qtjambi:qtjambi-native-linux-x64:6.10.1")
-    implementation("io.qtjambi:qtjambi-native-macos:6.10.1")
+    implementation("io.qtjambi:qtjambi:6.10.1")
+
+    if (resolvedPlatform == "windows") {
+        implementation("io.qtjambi:qtjambi-native-windows-x64:6.10.1")
+    } else if (resolvedPlatform == "linux") {
+        implementation("io.qtjambi:qtjambi-native-linux-x64:6.10.1")
+    } else if (resolvedPlatform == "macos") {
+        implementation("io.qtjambi:qtjambi-native-macos:6.10.1")
+    }
 }
 
 tasks.shadowJar {

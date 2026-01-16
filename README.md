@@ -2,7 +2,9 @@
 # Spool
 An embroidery, quilting, and sewing file manager
 
-To use this project, ensure that Python 3.9+ and `pyembroidery` is installed using the following
+To use this project, [Qt](https://www.qt.io/development/download-qt-installer) must be installed.
+It is typically preinstalled on Linux machines.
+Also ensure that Python 3.9+ with `pyembroidery` is installed using the following
 command:
 
 ```shell

@@ -1,7 +1,7 @@
 package io.github.qpcrummer.spool.database;
 
 import io.github.qpcrummer.spool.file.FileRecord;
-import io.github.qpcrummer.spool.gui_2.FilePanel;
+import io.github.qpcrummer.spool.gui.FilePanel;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +11,15 @@ import java.util.stream.Collectors;
 public class DBUtils {
     private static FileQuery previousQuery;
 
-    public static void addFile(String path, String fileType, String seller, List<String> tags) throws Exception {
+    /**
+     * Adds a new file to the database
+     * @param path File name
+     * @param fileType File extension
+     * @param seller Author of file
+     * @param tags Attached tags
+     * @throws SQLException An error occurred while adding the file
+     */
+    public static void addFile(String path, String fileType, String seller, List<String> tags) throws SQLException {
         String url = "jdbc:sqlite:files.db";
         int fileId;
         try (Connection conn = DriverManager.getConnection(url)) {
@@ -61,7 +69,12 @@ public class DBUtils {
         repeatLastSearch();
     }
 
-    public static void removeFile(int fileId) throws Exception {
+    /**
+     * Removes a file from the database
+     * @param fileId The file's id {@link FileRecord#id()}
+     * @throws SQLException The removal of the file from the database failed
+     */
+    public static void removeFile(int fileId) throws SQLException {
         String url = "jdbc:sqlite:files.db";
         try (Connection conn = DriverManager.getConnection(url)) {
 
@@ -287,6 +300,9 @@ public class DBUtils {
         FilePanel.updateSearchList(results);
     }
 
+    /**
+     * Searches again with the same parameters/filters as the last search
+     */
     public static void repeatLastSearch() {
         if (previousQuery == null) {
             FilePanel.updateSearchList(Database.getAllFiles());
@@ -299,6 +315,13 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Adds upon the previous search
+     * @param seller The new seller; Null to use previous
+     * @param fileNameLike The new file name; Null to use previous
+     * @param fileType The new file type; Null to use previous
+     * @param requiredTags The tag filter; Empty list to remove all; Null to use previous
+     */
     public static void incrementalSearch(  String seller,
                                            String fileNameLike,
                                            String fileType,
@@ -323,7 +346,13 @@ public class DBUtils {
         }
     }
 
-    public static void addTagToFile(int fileId, String tag) throws Exception {
+    /**
+     * Adds a tag to a file
+     * @param fileId File's id {@link FileRecord#id()}
+     * @param tag The tag to add
+     * @throws SQLException Failed to add tag to file in database
+     */
+    public static void addTagToFile(int fileId, String tag) throws SQLException {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:files.db")) {
 
             // Insert tag if missing
@@ -353,7 +382,13 @@ public class DBUtils {
         }
     }
 
-    public static void removeTagFromFile(int fileId, String tag) throws Exception {
+    /**
+     * Removes a tag from a file
+     * @param fileId File's id {@link FileRecord#id()}
+     * @param tag The tag to remove
+     * @throws SQLException Failed to remove tag in the database
+     */
+    public static void removeTagFromFile(int fileId, String tag) throws SQLException {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:files.db")) {
 
             // Get tag id
@@ -376,7 +411,12 @@ public class DBUtils {
         }
     }
 
-    public static void removeTagFromFiles(String tag) throws Exception {
+    /**
+     * Removes a tag from all files in the database
+     * @param tag Tag to remove
+     * @throws SQLException Failed to remove tag from all entries in the database
+     */
+    public static void removeTagFromFiles(String tag) throws SQLException {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:files.db")) {
 
             // Get tag id
@@ -405,6 +445,12 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Updates the name of a tag for each entry in the database
+     * @param oldName Original name
+     * @param newName New name
+     * @throws Exception Failed to change name of the tag in the database
+     */
     public static void updateTagName(String oldName, String newName) throws Exception {
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:files.db")) {
 
@@ -446,5 +492,4 @@ public class DBUtils {
             }
         }
     }
-
 }
