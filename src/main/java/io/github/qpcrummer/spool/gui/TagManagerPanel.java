@@ -2,6 +2,8 @@ package io.github.qpcrummer.spool.gui;
 
 import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
+import io.qt.core.Qt;
+import io.qt.gui.QFont;
 import io.qt.widgets.*;
 
 public class TagManagerPanel {
@@ -13,6 +15,14 @@ public class TagManagerPanel {
         QVBoxLayout mainLayout = new QVBoxLayout(panel);
         mainLayout.setContentsMargins(6, 6, 6, 6);
         mainLayout.setSpacing(6);
+
+        QLabel label = new QLabel("Tag Manager");
+        QFont font = new QFont();
+        font.setPointSize(16);
+        font.setBold(true);
+        label.setFont(font);
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter);
+        mainLayout.addWidget(label);
 
         QScrollArea scrollArea = new QScrollArea();
         scrollArea.setWidgetResizable(true);

@@ -6,15 +6,17 @@ import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.file.UploadRecord;
 import io.github.qpcrummer.spool.gui.upload.FileDropZone;
-import io.github.qpcrummer.spool.utils.FileConverter;
+import io.github.qpcrummer.spool.utils.FileIOUtils;
 import io.github.qpcrummer.spool.utils.FileUtils;
 import io.qt.core.Qt;
+import io.qt.gui.QFont;
 import io.qt.widgets.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,6 +29,14 @@ public class UploadPanel {
 
         QVBoxLayout layout = new QVBoxLayout(panel);
         layout.setSpacing(8);
+
+        QLabel label = new QLabel("File Upload");
+        QFont font = new QFont();
+        font.setPointSize(16);
+        font.setBold(true);
+        label.setFont(font);
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter);
+        layout.addWidget(label);
 
         QVBoxLayout dropWrapper = new QVBoxLayout();
         dropWrapper.setAlignment(Qt.AlignmentFlag.AlignCenter);
@@ -54,21 +64,9 @@ public class UploadPanel {
                     .filter(f -> !f.getFileRecord().seller().trim().isEmpty())
                     .toList();
 
-            for (UploadRecord file : trimmed) {
-                try {
-                    DBUtils.addFile(file.getFileRecord().path(), file.getFileRecord().fileType(), file.getFileRecord().seller(), file.getTags());
-                    copyFile(file.getPath());
-                    FilePanel.getModel().addFile(file.getFileRecord());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
+            FileIOUtils.handleFileSUpload(trimmed);
             clearLayout(listLayout);
             UPLOAD_RECORDS.clear();
-
-            List<String> names = trimmed.stream().map(uploadRecord -> uploadRecord.getFileRecord().path()).toList();
-            FileConverter.processImageConversions(names);
         });
 
         layout.addWidget(uploadButton);
@@ -84,14 +82,6 @@ public class UploadPanel {
                 layout.removeWidget(widget);
                 widget.setParent(null);
             }
-        }
-    }
-
-    private static void copyFile(Path file) {
-        try {
-            Files.copy(file, Constants.FILES.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.github.qpcrummer'
-version = '1.1.0'
+version = '2.0.0'
 
 repositories {
     mavenCentral()
@@ -49,14 +49,24 @@ dependencies {
 }
 
 tasks.shadowJar {
-    archiveBaseName = "Spool"
+    if (platform != null) {
+        archiveBaseName = "Spool-" + platform
+    } else if (osName.contains("win")) {
+        archiveBaseName = "Spool-Windows"
+    } else if (osName.contains("linux")) {
+        archiveBaseName = "Spool-Linux"
+    } else if (osName.contains("mac")) {
+        archiveBaseName = "Spool-macOS"
+    } else {
+        throw new GradleException("Unsupported OS: " + osName)
+    }
 }
 
 application {
     mainClass = 'io.github.qpcrummer.spool.Main'
 }
 
-def targetJavaVersion = 22
+def targetJavaVersion = 25
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly

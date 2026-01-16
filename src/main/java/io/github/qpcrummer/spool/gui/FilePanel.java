@@ -5,10 +5,7 @@ import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.gui.file_list.FileItemDelegate;
 import io.github.qpcrummer.spool.gui.file_list.FileListModel;
-import io.qt.core.QItemSelection;
-import io.qt.core.QMetaObject;
-import io.qt.core.QModelIndex;
-import io.qt.core.Qt;
+import io.qt.core.*;
 import io.qt.widgets.*;
 
 import java.util.List;
@@ -155,5 +152,31 @@ public class FilePanel {
                 () -> model.setFiles(filteredFiles),
                 Qt.ConnectionType.QueuedConnection
         );
+    }
+
+    /**
+     * Refreshes all the visible file's thumbnails
+     */
+    public static void refreshVisibleThumbnails() {
+        if (listView.model() == null) {
+            return;
+        }
+
+        QModelIndex top = listView.indexAt(new QPoint(0, 0));
+        QModelIndex bottom = listView.indexAt(
+                new QPoint(0, listView.viewport().height() - 1)
+        );
+
+        if (!top.isValid()) {
+            return;
+        }
+
+        int start = top.row();
+        int end = bottom.isValid() ? bottom.row() : listView.model().rowCount() - 1;
+
+        for (int row = start; row <= end; row++) {
+            QModelIndex index = listView.model().index(row, 0);
+            listView.model().dataChanged.emit(index, index);
+        }
     }
 }

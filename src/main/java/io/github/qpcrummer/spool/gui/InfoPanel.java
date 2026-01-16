@@ -4,7 +4,10 @@ import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.file.FileRecord;
+import io.github.qpcrummer.spool.gui.conversion.ConversionDialog;
 import io.github.qpcrummer.spool.gui.file_list.FileItemDelegate;
+import io.qt.core.Qt;
+import io.qt.gui.QFont;
 import io.qt.gui.QTextOption;
 import io.qt.widgets.*;
 
@@ -21,6 +24,14 @@ public class InfoPanel {
         QVBoxLayout layout = new QVBoxLayout(panel);
         layout.setContentsMargins(6, 6, 6, 6);
         layout.setSpacing(6);
+
+        QLabel label = new QLabel("Selected File");
+        QFont font = new QFont();
+        font.setPointSize(16);
+        font.setBold(true);
+        label.setFont(font);
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter);
+        layout.addWidget(label);
 
         fileNameEdit = new QTextEdit();
         fileNameEdit.setReadOnly(true);
@@ -67,8 +78,10 @@ public class InfoPanel {
 
         convertButton.clicked.connect(() -> {
             if (Data.SELECTED_FILE != null) {
-                // TODO convert logic here
-                //FileConverter.processFile(selectedFile.path());
+                ConversionDialog dialog = new ConversionDialog(
+                        convertButton
+                );
+                dialog.exec();
             }
         });
 

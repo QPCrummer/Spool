@@ -17,6 +17,8 @@ public class MainGUI {
         QMainWindow window = createMainWindow();
         window.show();
 
+        window.destroyed.connect(() -> System.exit(0));
+
         QApplication.exec();
     }
 
@@ -66,7 +68,7 @@ public class MainGUI {
         splitter.addWidget(TagManagerPanel.init());
         splitter.addWidget(InfoPanel.init());
 
-        splitter.setSizes(List.of(100, 100, 400));
+        splitter.setSizes(List.of(200, 200, 200));
         return splitter;
     }
 }

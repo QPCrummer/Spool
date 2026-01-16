@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
 
 public final class Constants {
@@ -40,9 +41,9 @@ public final class Constants {
     /**
      * Supported file extensions that can be exported (converted)
      */
-    public static final String[] SUPPORTED_WRITING_FILE_TYPES = {
+    public static final List<String> SUPPORTED_WRITING_FILE_TYPES = List.of(
             "dst", "exp", "gcode", "jef", "pec", "pes", "tbf",
             "u01", "vp3", "xxx", "col", "edr", "inf", "pmv",
             "plt", "qcc", "hqf"
-    };
+    );
 }

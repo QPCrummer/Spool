@@ -4,28 +4,50 @@ import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.file.FileRecord;
+import io.github.qpcrummer.spool.file.UploadRecord;
+import io.github.qpcrummer.spool.gui.FilePanel;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class FileConverter {
+public class FileIOUtils {
+    private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
 
     /**
      * Processes a list of File names and generates their thumbnails concurrently
-     * @param filesNames The names of the files to be processed
+     * @param trimmed The UploadRecords that are being processed
      */
-    public static void processImageConversions(List<String> filesNames) {
-        filesNames.parallelStream().forEach(FileConverter::generateThumbnail);
-        // TODO Update thumbnails
+    public static void handleFileSUpload(List<UploadRecord> trimmed) {
+        EXECUTOR.execute(() -> {
+            for (UploadRecord file : trimmed) {
+                try {
+                    copyFile(file.getPath());
+                    DBUtils.addFile(file.getFileRecord().path(), file.getFileRecord().fileType(), file.getFileRecord().seller(), file.getTags());
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            List<String> names = trimmed.stream().map(uploadRecord -> uploadRecord.getFileRecord().path()).toList();
+            FileIOUtils.processImageConversions(names);
+        });
+    }
+
+    private static void processImageConversions(List<String> filesNames) {
+        filesNames.parallelStream().forEach(FileIOUtils::generateThumbnail);
+        FilePanel.refreshVisibleThumbnails();
     }
 
     /**
@@ -63,6 +85,14 @@ public class FileConverter {
         }
     }
 
+    private static void copyFile(Path file) {
+        try {
+            Files.copy(file, Constants.FILES.resolve(file.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static void generateThumbnailPDF(Path pdfPath, Path pngPath) {
         try (PDDocument document = Loader.loadPDF(
                 new RandomAccessReadBufferedFile(pdfPath))) {
@@ -86,31 +116,33 @@ public class FileConverter {
      * @param toFileType Type of file to convert to
      */
     public static void convert(FileRecord file, String toFileType) {
-        String convertedFile = file.path().replaceAll("\\.[^.]+$", "") + "." + toFileType.toLowerCase(Locale.ROOT);
+        EXECUTOR.execute(() -> {
+            String convertedFile = file.path().replaceAll("\\.[^.]+$", "") + "." + toFileType.toLowerCase(Locale.ROOT);
 
-        // Python one-liner script
-        String script =
-                "import pystitch\n" +
-                        "p=pystitch.read(r'" + file.path() + "')\n" +
-                        "pystitch.write(p, r'" + convertedFile + "')\n";
+            // Python one-liner script
+            String script =
+                    "import pystitch\n" +
+                            "p=pystitch.read(r'" + file.path() + "')\n" +
+                            "pystitch.write(p, r'" + convertedFile + "')\n";
 
-        try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "python", "-c", script
-            );
+            try {
+                ProcessBuilder pb = new ProcessBuilder(
+                        "python", "-c", script
+                );
 
-            pb.redirectErrorStream(true);
-            pb.directory(Constants.FILES.toFile());
-            Process process = pb.start();
+                pb.redirectErrorStream(true);
+                pb.directory(Constants.FILES.toFile());
+                Process process = pb.start();
 
-            int exit = process.waitFor();
-            if (exit != 0) {
-                throw new IOException("Conversion failed: exit code " + exit);
+                int exit = process.waitFor();
+                if (exit != 0) {
+                    throw new IOException("Conversion failed: exit code " + exit);
+                }
+
+                DBUtils.addFile(convertedFile, toFileType.toUpperCase(Locale.ROOT), file.seller(), Database.getTagsForFile(file.id()));
+            } catch (Exception ex) {
+                LoggerUtils.LOGGER.warn("Failed to convert file", ex);
             }
-
-            DBUtils.addFile(convertedFile, toFileType.toUpperCase(Locale.ROOT), file.seller(), Database.getTagsForFile(file.id()));
-        } catch (Exception ex) {
-            LoggerUtils.LOGGER.warn("Failed to convert file", ex);
-        }
+        });
     }
 }

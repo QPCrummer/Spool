@@ -29,13 +29,6 @@ public class FileListModel extends QAbstractListModel {
         return new QVariant();
     }
 
-    public void addFile(FileRecord file) {
-        int row = files.size();
-        beginInsertRows(new QModelIndex(), row, row);
-        files.add(file);
-        endInsertRows();
-    }
-
     public void removeFileAt(int index) {
         if (index < 0 || index >= files.size()) {
             return;

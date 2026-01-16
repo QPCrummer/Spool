@@ -1,5 +1,6 @@
 package io.github.qpcrummer.spool.database;
 
+import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.utils.LoggerUtils;
 
@@ -47,10 +48,10 @@ public class Database {
             stmt.execute(createFiles);
             stmt.execute(createTags);
             stmt.execute(createFileTags);
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             LoggerUtils.LOGGER.warn("Failed to create database", e);
         }
+        Data.ACTIVE_FILES = getAllFiles();
     }
 
     /**
