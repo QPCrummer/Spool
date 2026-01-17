@@ -42,12 +42,12 @@ public class FileItemDelegate extends QStyledItemDelegate {
         QFont font = painter.font();
         font.setBold(true);
         painter.setFont(font);
-        painter.drawText(rect.adjusted(6, 6, -54, -30), file.path(), Qt.AlignmentFlag.AlignLeft.combined(Qt.AlignmentFlag.AlignVCenter));
+        painter.drawText(rect.adjusted(6, 6, -54, -30), Qt.AlignmentFlag.AlignLeft.combined(Qt.AlignmentFlag.AlignVCenter).value(), file.path());
 
         painter.setPen(new QColor("gray"));
         font.setBold(false);
         painter.setFont(font);
-        painter.drawText(rect.adjusted(6, 30, -54, -6), file.seller(), Qt.AlignmentFlag.AlignLeft.combined(Qt.AlignmentFlag.AlignVCenter));
+        painter.drawText(rect.adjusted(6, 30, -54, -6), Qt.AlignmentFlag.AlignLeft.combined(Qt.AlignmentFlag.AlignVCenter).value(), file.seller());
 
         QRect imageRect = new QRect(rect.right() - 128 - 4, rect.top() + 4, 120, 120);
         String thumbPath = file.getThumbnailPath();

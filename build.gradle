@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'io.github.qpcrummer'
-version = '2.0.0'
+version = '2.0.1'
 
 repositories {
     mavenCentral()
@@ -36,15 +36,14 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.13.2'
     implementation 'org.apache.pdfbox:pdfbox:3.0.6'
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
-    implementation("io.qtjambi:qtjambi:6.10.1")
-    implementation("io.qtjambi:qtjambi:6.10.1")
+    implementation("io.qtjambi:qtjambi:6.4.2")
 
     if (resolvedPlatform == "windows") {
-        implementation("io.qtjambi:qtjambi-native-windows-x64:6.10.1")
+        implementation("io.qtjambi:qtjambi-native-windows-x64:6.4.2")
     } else if (resolvedPlatform == "linux") {
-        implementation("io.qtjambi:qtjambi-native-linux-x64:6.10.1")
+        implementation("io.qtjambi:qtjambi-native-linux-x64:6.4.2")
     } else if (resolvedPlatform == "macos") {
-        implementation("io.qtjambi:qtjambi-native-macos:6.10.1")
+        implementation("io.qtjambi:qtjambi-native-macos:6.4.2")
     }
 }
 

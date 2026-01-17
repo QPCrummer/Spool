@@ -2,7 +2,6 @@ package io.github.qpcrummer.spool.gui;
 
 import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.Data;
-import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.file.UploadRecord;
 import io.github.qpcrummer.spool.gui.upload.FileDropZone;
@@ -16,7 +15,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -138,7 +136,7 @@ public class UploadPanel {
 
         QLineEdit author = new QLineEdit();
         author.editingFinished.connect(() -> {
-            FileRecord fileRecord = FileRecord.partialClone(record.getFileRecord(), author.getText());
+            FileRecord fileRecord = FileRecord.partialClone(record.getFileRecord(), author.text());
             record.setFileRecord(fileRecord);
         });
         author.setStyleSheet("""

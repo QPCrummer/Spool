@@ -148,9 +148,7 @@ public class FilePanel {
      */
     public static void updateSearchList(List<FileRecord> filteredFiles) {
         QMetaObject.invokeMethod(
-                model,
-                () -> model.setFiles(filteredFiles),
-                Qt.ConnectionType.QueuedConnection
+                () -> model.setFiles(filteredFiles)
         );
     }
 
