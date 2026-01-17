@@ -11,6 +11,8 @@ import io.github.qpcrummer.spool.gui.FilePanel;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 
 import javax.imageio.ImageIO;
@@ -29,6 +31,7 @@ import java.util.concurrent.Executors;
 
 public class FileIOUtils {
     private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final int MAX_THUMB_SIZE = 1024;
 
     /**
      * Processes a list of File names and generates their thumbnails concurrently
@@ -101,15 +104,29 @@ public class FileIOUtils {
     private static void generateThumbnailPDF(Path pdfPath, Path pngPath) {
         try (PDDocument document = Loader.loadPDF(
                 new RandomAccessReadBufferedFile(pdfPath))) {
-            PDFRenderer pdfRenderer = new PDFRenderer(document);
 
-            // Render the first page (page index 0) at 300 DPI for good quality
-            BufferedImage image = pdfRenderer.renderImageWithDPI(0, 300);
+            PDFRenderer renderer = new PDFRenderer(document);
+            PDPage page = document.getPage(0);
 
-            // Save the BufferedImage as a PNG file
+            float widthPt = page.getMediaBox().getWidth();
+            float heightPt = page.getMediaBox().getHeight();
+
+            float widthIn = widthPt / 72f;
+            float heightIn = heightPt / 72f;
+
+            float dpiX = MAX_THUMB_SIZE / widthIn;
+            float dpiY = MAX_THUMB_SIZE / heightIn;
+            float dpi = Math.min(Math.min(dpiX, dpiY), 300f);
+
+            BufferedImage image = renderer.renderImageWithDPI(
+                    0,
+                    dpi,
+                    ImageType.RGB
+            );
+
             ImageIO.write(image, "PNG", pngPath.toFile());
+            LoggerUtils.LOGGER.info("Converted PDF to PNG at {} DPI", dpi);
 
-            LoggerUtils.LOGGER.info("Converted PDF to PNG");
         } catch (IOException e) {
             LoggerUtils.LOGGER.warn("Failed to convert PDF to PNG", e);
         }
