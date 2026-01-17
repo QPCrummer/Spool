@@ -12,10 +12,16 @@ public record FileRecord(int id, String path, String fileType, String seller) {
      * @return Thumbnail path or null if nonexistent
      */
     public String getThumbnailPath() {
-        Path path = Constants.FILES.resolve(path().replaceAll("\\.[^.]+$", "") + ".png");
+        // Thumbnail for >= v2.0.2
+        Path path = Constants.FILES.resolve(path() + ".png");
         if (Files.exists(path)) {
             return path.toString();
         } else {
+            // Thumbnail for < v2.0.2
+            path = Constants.FILES.resolve(path().replaceAll("\\.[^.]+$", "") + ".png");
+            if (Files.exists(path)) {
+                return path.toString();
+            }
             return null;
         }
     }

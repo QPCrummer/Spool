@@ -55,7 +55,7 @@ public class FileIOUtils {
      * @param embroideryFileName The source file path after being moved
      */
     private static void generateThumbnail(String embroideryFileName) {
-        String pngFileName = embroideryFileName.replaceAll("\\.[^.]+$", "") + ".png";
+        String pngFileName = embroideryFileName + ".png";
 
         if (embroideryFileName.contains(".pdf")) {
             generateThumbnailPDF(Constants.FILES.resolve(embroideryFileName), Constants.FILES.resolve(pngFileName));
