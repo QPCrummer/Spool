@@ -1,13 +1,30 @@
 ![SpoolLogo1.png](SpoolLogo1.png)
 # Spool
-An embroidery, quilting, and sewing file manager
+An embroidery, quilting, and sewing file manager!
 
-To use this project, [Qt](https://www.qt.io/development/download-qt-installer) must be installed.
-It is typically preinstalled on Linux machines.
-This program runs on **Java 25**.
-Also ensure that Python 3.9+ with `pyembroidery` is installed using the following
-command:
+## Installation
+The following dependencies must be met:
+- Java 25 or above
+- Qt 6.4.2
+- Python 3.9 or above
+- pyembroidery python package
 
+### How to install Qt
+**Official Installation**
+Follow the guide to install the launcher: [Qt Guide](https://www.qt.io/development/download-qt-installer)
+**Note:** This appears to require an account. I am unsure if the account is free, but I assume it is.
+
+**Unofficial Installation (easier, no account)**
+Replace `{os}` with your os: linux, windows, macos.
+If using windows, add `win64_msvc2019_64` after `6.4.2`
+```shell
+python3 -m pip install --user aqtinstall
+python3 -m aqt install-qt {os} desktop 6.4.2 --outputdir ~/Qt
+```
+Then add `export PATH="$HOME/Qt/6.4.2/{os}/bin:$PATH"` before you launch script for the Spool jar
+
+### How to install Pyembroidery
+Simply run:
 ```shell
 pip install --upgrade --force-reinstall git+https://github.com/QPCrummer/pystitch.git@main
 ```
@@ -67,8 +84,9 @@ pip install --upgrade --force-reinstall git+https://github.com/QPCrummer/pystitc
     - qcc
   - General Purpose:
     - pdf
+    - zip
 - Add custom tags to files to sort and filter your files
 - Search through files to find matches
-- Export selected files directly to an attached USB drive
+- Export selected files directly to an attached USB drive (**WIP**)
 - Upload files in bulk
 - Convert between many different file formats
