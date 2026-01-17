@@ -123,7 +123,7 @@ public class InfoPanel {
             return;
         }
 
-        for (String tag : Data.FILE_TAGS.tags()) {
+        for (String tag : Data.FILE_TAGS.toList()) {
             QCheckBox checkBox = new QCheckBox(tag);
             checkBox.setChecked(Data.SELECTED_FILE_TAGS.contains(tag));
 

@@ -2,6 +2,7 @@ package io.github.qpcrummer.spool.gui;
 
 import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
+import io.github.qpcrummer.spool.utils.FileIOUtils;
 import io.qt.core.Qt;
 import io.qt.gui.QFont;
 import io.qt.widgets.*;
@@ -49,19 +50,19 @@ public class TagManagerPanel {
         addButton.clicked.connect(() -> {
             String newTag = "New Tag";
             int suffix = 1;
-            while (Data.FILE_TAGS.tags().contains(newTag)) {
+            while (Data.FILE_TAGS.contains(newTag)) {
                 newTag = "New Tag " + suffix++;
             }
 
-            Data.FILE_TAGS.tags().add(newTag);
-            Data.FILE_TAGS.serialize();
+            Data.FILE_TAGS.add(newTag);
+            FileIOUtils.serializeTags();
             addTagRow(tagListLayout, newTag);
             broadcastUpdates();
         });
 
         mainLayout.addWidget(addButton);
 
-        for (String tag : Data.FILE_TAGS.tags()) {
+        for (String tag : Data.FILE_TAGS.toList()) {
             addTagRow(tagListLayout, tag);
         }
 
@@ -90,16 +91,16 @@ public class TagManagerPanel {
                 return;
             }
 
-            if (!newName.equals(currentName[0]) && Data.FILE_TAGS.tags().contains(newName)) {
+            if (!newName.equals(currentName[0]) && Data.FILE_TAGS.contains(newName)) {
                 tagEdit.setText(currentName[0]);
                 return;
             }
 
             // Update
             DBUtils.updateTagName(currentName[0], newName);
-            Data.FILE_TAGS.tags().remove(currentName[0]);
-            Data.FILE_TAGS.tags().add(newName);
-            Data.FILE_TAGS.serialize();
+            Data.FILE_TAGS.remove(currentName[0]);
+            Data.FILE_TAGS.add(newName);
+            FileIOUtils.serializeTags();
             currentName[0] = newName;
             broadcastUpdates();
         });
@@ -113,10 +114,10 @@ public class TagManagerPanel {
             row.dispose();
 
             // Update
-            Data.FILE_TAGS.tags().remove(currentName[0]);
+            Data.FILE_TAGS.remove(currentName[0]);
             DBUtils.removeTagFromFiles(currentName[0]);
             DBUtils.repeatLastSearch();
-            Data.FILE_TAGS.serialize();
+            FileIOUtils.serializeTags();
             broadcastUpdates();
         });
 

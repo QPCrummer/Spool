@@ -106,8 +106,6 @@ public class UploadPanel {
             FileRecord fRecord = new FileRecord(-1, fileName, fileExt, "");
             UploadRecord record = new UploadRecord(fRecord, Paths.get(pathStr));
             addUploadEntry(listLayout, record);
-        } else {
-            // TODO Show error panel
         }
     }
 
@@ -160,7 +158,7 @@ public class UploadPanel {
         QMenu tagMenu = new QMenu(tagButton);
         tagButton.setMenu(tagMenu);
 
-        for (String tag : Data.FILE_TAGS.tags()) {
+        for (String tag : Data.FILE_TAGS.toList()) {
             QCheckBox checkBox = new QCheckBox(tag);
             checkBox.toggled.connect(b -> {
                 if (b) record.getTags().add(tag);
@@ -220,7 +218,7 @@ public class UploadPanel {
         QMenu tagMenu = tagButton.menu();
         tagMenu.clear();
 
-        for (String tag : Data.FILE_TAGS.tags()) {
+        for (String tag : Data.FILE_TAGS.toList()) {
             QCheckBox checkBox = new QCheckBox(tag);
             checkBox.setChecked(record.getTags().contains(tag));
 

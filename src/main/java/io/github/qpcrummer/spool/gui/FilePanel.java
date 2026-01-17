@@ -70,7 +70,7 @@ public class FilePanel {
     public static void rebuildFilterMenu() {
         filterMenu.clear();
 
-        for (String tag : Data.FILE_TAGS.tags()) {
+        for (String tag : Data.FILE_TAGS.toList()) {
             QCheckBox checkBox = new QCheckBox(tag);
 
             checkBox.setChecked(Data.ACTIVE_FILTERS.contains(tag));
@@ -95,7 +95,7 @@ public class FilePanel {
             Data.ACTIVE_FILTERS.remove(filter);
         }
         try {
-            DBUtils.incrementalSearch(null, null, null, Data.ACTIVE_FILTERS);
+            DBUtils.incrementalSearch(null, null, null, Data.ACTIVE_FILTERS.toList());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

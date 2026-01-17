@@ -1,7 +1,8 @@
 package io.github.qpcrummer.spool;
 
-import io.github.qpcrummer.spool.database.Tags;
 import io.github.qpcrummer.spool.file.FileRecord;
+import io.github.qpcrummer.spool.utils.FileIOUtils;
+import io.github.qpcrummer.spool.utils.OrderedTags;
 import io.qt.core.QModelIndex;
 
 import java.util.ArrayList;
@@ -11,11 +12,11 @@ public class Data {
     /**
      * All loaded tags
      */
-    public static Tags FILE_TAGS = Tags.deserialize();
+    public static OrderedTags FILE_TAGS = FileIOUtils.deserializeTags();
     /**
      * Filters being applied to the file list
      */
-    public static final List<String> ACTIVE_FILTERS = new ArrayList<>();
+    public static final OrderedTags ACTIVE_FILTERS = new OrderedTags();
     /**
      * Files in the file list
      */

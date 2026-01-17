@@ -1,6 +1,8 @@
 package io.github.qpcrummer.spool.utils;
 
+import com.google.gson.reflect.TypeToken;
 import io.github.qpcrummer.spool.Constants;
+import io.github.qpcrummer.spool.Data;
 import io.github.qpcrummer.spool.database.DBUtils;
 import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.file.FileRecord;
@@ -13,7 +15,10 @@ import org.apache.pdfbox.rendering.PDFRenderer;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -144,5 +149,35 @@ public class FileIOUtils {
                 LoggerUtils.LOGGER.warn("Failed to convert file", ex);
             }
         });
+    }
+
+    /**
+     * Write the tags to file
+     */
+    public static void serializeTags() {
+        try (FileWriter writer = new FileWriter(Constants.TAGS_FILE.toFile())) {
+            String data = Constants.GSON.toJson(Data.FILE_TAGS.toList());
+            writer.write(data);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Reads the tags from {@link Constants#TAGS_FILE}
+     * @return Tags instance with tags data
+     */
+    public static OrderedTags deserializeTags() {
+        if (Files.notExists(Constants.TAGS_FILE)) {
+            return new OrderedTags();
+        }
+
+        try (Reader reader = Files.newBufferedReader(Constants.TAGS_FILE)) {
+            Type type = new TypeToken<List<String>>() {}.getType();
+            List<String> tags = Constants.GSON.fromJson(reader, type);
+            return OrderedTags.fromList(tags);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
