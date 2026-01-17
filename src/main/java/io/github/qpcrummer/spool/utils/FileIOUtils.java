@@ -1,5 +1,7 @@
 package io.github.qpcrummer.spool.utils;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import io.github.qpcrummer.spool.Constants;
 import io.github.qpcrummer.spool.Data;
@@ -8,6 +10,7 @@ import io.github.qpcrummer.spool.database.Database;
 import io.github.qpcrummer.spool.file.FileRecord;
 import io.github.qpcrummer.spool.file.UploadRecord;
 import io.github.qpcrummer.spool.gui.FilePanel;
+import io.github.qpcrummer.spool.migrator.LegacyTags;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.io.RandomAccessReadBufferedFile;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -190,9 +193,20 @@ public class FileIOUtils {
         }
 
         try (Reader reader = Files.newBufferedReader(Constants.TAGS_FILE)) {
-            Type type = new TypeToken<List<String>>() {}.getType();
-            List<String> tags = Constants.GSON.fromJson(reader, type);
-            return OrderedTags.fromList(tags);
+            JsonElement root = JsonParser.parseReader(reader);
+
+            if (root.isJsonArray()) {
+                Type type = new TypeToken<List<String>>() {}.getType();
+                List<String> tags = Constants.GSON.fromJson(root, type);
+                return OrderedTags.fromList(tags);
+            }
+
+            if (root.isJsonObject()) {
+                LegacyTags legacy = Constants.GSON.fromJson(root, LegacyTags.class);
+                return legacy.migrate();
+            }
+
+            throw new IllegalStateException("Unknown tags file format");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

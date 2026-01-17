@@ -12,7 +12,7 @@ public class Main {
      * Launches the Spool program
      * @param args There are no args
      */
-    public static void main(String[] args) {
+    static void main(String[] args) {
         // Set up DB
         Database.init();
 
